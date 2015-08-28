@@ -1,0 +1,91 @@
+﻿@model List<VmStock>
+
+@{
+    ViewBag.Title = "GridPanel Remote Paging Test";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+
+    var X = Html.X();
+}
+
+<h2>@ViewBag.Title</h2>
+
+@(Html.X().ResourceManager()) 
+
+@(Html.X().GridPanel()
+        .Title("Generic List[Remote Paging]")
+        .ID("myGrid")
+        .Width(500)
+        .Height(250)
+        .Scroll(ScrollMode.Vertical)
+        .Store
+        (
+            Html.X().Store()
+                .ID("store1")
+                .PageSize(100)
+                .RemotePaging(true)
+                .DataSource(Model)
+                .Model
+                (
+                    Html.X().Model()
+                    .Fields
+                    (
+                        new ModelField("Name", ModelFieldType.String),
+                        new ModelField("UnitPrice ", ModelFieldType.Float),
+                        new ModelField("Amount", ModelFieldType.Float),
+                        new ModelField("Total", ModelFieldType.Float)
+                    )
+                )
+                .Proxy
+                 (
+                        Html.X().AjaxProxy()
+                        .Url(Url.Action("GetData"))
+                        .StartParam("start")
+                        .LimitParam("limit")
+                        .PageParam("page")
+                        .Reader
+                        (
+                            Html.X().JsonReader()
+                            .RootProperty("data")
+                            .TotalProperty("total")
+                        )
+                 )
+        )
+        .ColumnModel
+        (
+            Html.X().RowNumbererColumn().Width(50),
+
+            Html.X().Column()
+                .Text("Name")
+                .DataIndex("Name")
+                .Width(150),
+
+            Html.X().Column()
+                .Text("UnitPrice")
+                .DataIndex("UnitPrice")
+                .Align(Alignment.Right)
+                .Width(80),
+
+            Html.X().Column()
+                .Text("Amount")
+                .DataIndex("Amount")
+                .Width(80)
+                .Align(Alignment.Right),
+
+            Html.X().Column()
+                .Text("Total")
+                .DataIndex("Total")
+                .Align(Alignment.Right)
+                .Width(80)
+        )
+        .SelectionModel
+        (
+            Html.X().RowSelectionModel().Mode(SelectionMode.Single)
+        )
+        .BottomBar
+        (
+             Html.X().PagingToolbar()
+        )
+)
